@@ -1,4 +1,6 @@
+import 'package:duckdb_cli/duckdb_invoke.dart';
 import 'package:duckdb_cli/use_excel_plus.dart';
+import 'package:duckdb_cli/use_sqlite.dart';
 import 'package:duckdb_cli/write_xlsx.dart';
 
 
@@ -10,5 +12,14 @@ void main(List<String> arguments) {
   }
   print("Writing './data/output1.xlsx'");
   writeSheet('./data/output1.xlsx');
+
+  runDuckDB();
+
+  writeSqlite("working.sqlite3");
+
+  setupTables();
+  globMatch("./data/fun*.xlsx");
+  printSourceFiles();
+
 }
 

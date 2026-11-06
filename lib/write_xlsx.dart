@@ -8,5 +8,4 @@ void writeSheet(String path) {
   sheet.updateCell(CellIndex.indexByString('A1'), TextCellValue('Batch Number'));
 
   File(path).writeAsBytesSync(excel.save()!);
-
 }
