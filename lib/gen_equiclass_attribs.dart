@@ -10,45 +10,51 @@
 import 'package:excel_plus/excel_plus.dart';
 import 'dart:io';
 
-class TableHeaders {
-  final Iterable<String> _headers;
-  
-  new(this._headers);
 
-  void writeHeaders(Sheet sheet) {
-    for (final (ix, item) in _headers.indexed) {
-      sheet.updateCell(CellIndex.indexByColumnRow(columnIndex: ix, rowIndex: 0), TextCellValue(item));
+class ExcelWorkbook {
+  String path;
+  final excel = Excel.createExcel();
+  int _sheetCount = 1;
+
+  ExcelWorkbook(this.path);
+
+  ExcelSheet addSheet(String sheetName) {
+    // first sheet needs to rename `Sheet1`
+    if (_sheetCount == 1) {
+      excel.rename('Sheet1', sheetName);
     }
+    else {
+      _sheetCount++;
+    }
+    final sheet = excel[sheetName];
+    return ExcelSheet(sheet: sheet);
   }
-  
+
+  void save() {
+    File(path).writeAsBytesSync(excel.save()!);
+  }
+
 }
 
-class SheetTable({required String sheetName, required Iterable<String> headers}) {
-  final String _sheetName = sheetName;
-  final TableHeaders _headers = TableHeaders(headers);
+class ExcelSheet({required Sheet sheet}) {
+  final Sheet _sheet = sheet;
 
-  void writeSheet(Excel excel) {
-    final sheet = excel[_sheetName];
-    _headers.writeHeaders(sheet);
+  void addHeaders(Iterable<String> colNames) {
+    for (final (ix, item) in colNames.indexed) {
+      _sheet.updateCell(CellIndex.indexByColumnRow(columnIndex: ix, rowIndex: 0), TextCellValue(item));
+    }
   }
-
 
 }
 
 void createXlsx(String path) {
-  final excel = Excel.createExcel();
-  // first sheet needs to rename `Sheet1`
-  final outstations = SheetTable(
-      sheetName: 'Telemetry Outstation',
-      headers: ['Temp ID', 'Description', 'Manufacturer', 'Model', 'Outstation Address']);
+  final wb = ExcelWorkbook(path);
+  final outstations = wb.addSheet('Telemetry Outstation');
+  outstations.addHeaders(['Temp ID', 'Description', 'Manufacturer', 'Model', 'Outstation Address']);
 
-  excel.rename('Sheet1', outstations._sheetName);
-  outstations.writeSheet(excel);
 
-  final modems = SheetTable(
-      sheetName: 'Modem',
-      headers: ['Temp ID', 'Description', 'Manufacturer', 'Model', 'IP Address']);
-  modems.writeSheet(excel);
+  final modems = wb.addSheet('Modem');
+  modems.addHeaders(['Temp ID', 'Description', 'Manufacturer', 'Model', 'IP Address']);
 
-  File(path).writeAsBytesSync(excel.save()!);
+  wb.save();
 }
