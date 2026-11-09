@@ -8,11 +8,39 @@
 import 'package:excel_plus/excel_plus.dart';
 import 'dart:io';
 
-void writeSheet(String path) {
+
+class ExcelWorkbook {
+  String path;
   final excel = Excel.createExcel();
-  final sheet = excel['Sheet1'];
+  int _sheetCount = 1;
 
-  sheet.updateCell(CellIndex.indexByString('A1'), TextCellValue('Batch Number'));
+  ExcelWorkbook(this.path);
 
-  File(path).writeAsBytesSync(excel.save()!);
+  ExcelSheet addSheet(String sheetName) {
+    // first sheet needs to rename `Sheet1`
+    if (_sheetCount == 1) {
+      excel.rename('Sheet1', sheetName);
+    }
+    else {
+      _sheetCount++;
+    }
+    final sheet = excel[sheetName];
+    return ExcelSheet(sheet: sheet);
+  }
+
+  void save() {
+    File(path).writeAsBytesSync(excel.save()!);
+  }
 }
+
+class ExcelSheet({required Sheet sheet}) {
+  final Sheet _sheet = sheet;
+
+  void addHeaders(Iterable<String> colNames) {
+    for (final (ix, item) in colNames.indexed) {
+      _sheet.updateCell(CellIndex.indexByColumnRow(columnIndex: ix, rowIndex: 0), TextCellValue(item));
+    }
+  }
+}
+
+
