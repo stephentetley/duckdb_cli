@@ -37,9 +37,12 @@ class ExcelSheet({required Sheet sheet}) {
   final Sheet _sheet = sheet;
 
   void addHeaders(Iterable<String> colNames) {
-    for (final (ix, item) in colNames.indexed) {
-      _sheet.updateCell(CellIndex.indexByColumnRow(columnIndex: ix, rowIndex: 0), TextCellValue(item));
-    }
+    List<TextCellValue> cells = colNames.map((col) => TextCellValue(col)).toList();
+    _sheet.appendRow(cells);
+  }
+
+  void addRow(Iterable<CellValue> cells) {
+    _sheet.appendRow(cells.toList());
   }
 }
 

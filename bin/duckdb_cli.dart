@@ -30,7 +30,7 @@ void main(List<String> arguments) async {
   globMatch("./data/fun*.xlsx");
   printSourceFiles();
 
-  createXlsx('./output/telemetry.xlsx');
+  // createXlsx('./output/telemetry.xlsx');
   createXlsx2('./data/temp.sqlite.db', './output/telemetry2.xlsx');
 
 }
