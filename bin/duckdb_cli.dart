@@ -2,7 +2,7 @@ import 'package:duckdb_cli/duckdb_invoke.dart';
 import 'package:duckdb_cli/use_excel_plus.dart';
 import 'package:duckdb_cli/use_sqlite.dart';
 import 'package:duckdb_cli/write_xlsx.dart';
-import 'package:duckdb_cli/output_xlsx_table.dart';
+import 'package:duckdb_cli/output_xlsx.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'dart:io';
 
@@ -30,26 +30,14 @@ void main(List<String> arguments) async {
   globMatch("./data/fun*.xlsx");
   printSourceFiles();
 
-  // createXlsx('./output/telemetry.xlsx');
-  createXlsx2('./data/temp.sqlite.db', './output/telemetry2.xlsx');
+  print("Writing './output/telemetry2.xlsx'");
+  createXlsx('./data/temp.sqlite.db', './output/telemetry2.xlsx');
 
 }
 
-void createXlsx(String path) {
-  final wb = ExcelWorkbook(path);
-  final outstations = wb.addSheet('Telemetry Outstation');
-  outstations.addHeaders(['Temp ID', 'Description', 'Manufacturer', 'Model', 'Outstation Address']);
-
-
-  final modems = wb.addSheet('Modem');
-  modems.addHeaders(['Temp ID', 'Description', 'Manufacturer', 'Model', 'IP Address']);
-
-  wb.save();
-}
-
-void createXlsx2(String dbpath, String outpath) {
+void createXlsx(String dbpath, String outpath) {
   final db = sqlite3.open(dbpath);
-  final wb = ExcelWorkbook(outpath);
+  final wb = ExcelWorkbook.createOrReplace(outpath);
   outputXlsxTable('Telemetry Outstations', db, wb);
   wb.save();
   db.close();
