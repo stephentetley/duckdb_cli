@@ -6,6 +6,7 @@
  */
 
 import 'package:sqlite3/sqlite3.dart';
+import 'package:change_case/change_case.dart';
 import 'package:duckdb_cli/write_xlsx.dart';
 
 /// todo - escaping...
@@ -36,6 +37,8 @@ void outputXlsxTable(String tableName, Database db, ExcelWorkbook wb) {
   
   final ResultSet rs2 = db.select(sql2);
   wb.insertInto(tableName, rs2);
+  wb.createNamedTable(sheetName: tableName, tableName: tableName.toPascalCase());
+
 
 }
 

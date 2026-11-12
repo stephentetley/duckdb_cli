@@ -53,6 +53,15 @@ class ExcelWorkbook {
     }
   }
 
+  void createNamedTable({required String sheetName, required String tableName}) {
+    final sheet = _excel[sheetName];
+    sheet.addTable(ExcelTable(
+      name: tableName, 
+      from: CellIndex.indexByString("A1"), 
+      to: CellIndex.indexByColumnRow(columnIndex: sheet.maxColumns - 1, rowIndex: sheet.maxRows - 1),
+      style: TableStyle.medium9));
+  }
+
 
   void createSheet(String sheetName, Iterable<({String name, String ty})> cols) {
     // In create mode, `Sheet1` is auto-created, the first sheet needs to rename it
