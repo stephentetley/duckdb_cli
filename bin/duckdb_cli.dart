@@ -37,6 +37,9 @@ void main(List<String> arguments) async {
 
 void createXlsx(String dbpath, String outpath) {
   final db = sqlite3.open(dbpath);
+  if (File(outpath).existsSync()) {
+    File(outpath).deleteSync();
+  }
   final wb = ExcelWorkbook.attach(outpath);
   outputXlsxTable('Telemetry Outstations', db, wb);
   wb.detach();

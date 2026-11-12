@@ -27,25 +27,24 @@ CellValue _makeCell(String ty, dynamic value) {
 class ExcelWorkbook {
   final String _outputPath;
   final Excel _excel;
-  int _sheetCount;
   final _ExcelMode _mode;
-  Map<String, Iterable<({String name, String ty})>> _sheetInfo = {};
+  final Map<String, Iterable<({String name, String ty})>> _sheetInfo = {};
 
-  ExcelWorkbook._(this._outputPath, this._excel, this._sheetCount, this._mode);
+  ExcelWorkbook._(this._outputPath, this._excel, this._mode);
 
   factory ExcelWorkbook.attach(String path) {
     if (File(path).existsSync()) {
       var excel = Excel.decodeBytes(File(path).readAsBytesSync());
-      return ExcelWorkbook._(path, excel, 1, _ExcelMode.edit);
+      return ExcelWorkbook._(path, excel, _ExcelMode.edit);
     } else {
       var excel = Excel.createExcel();
-      return ExcelWorkbook._(path, excel, 1, _ExcelMode.create);
+      return ExcelWorkbook._(path, excel, _ExcelMode.create);
     }
   }
 
   factory ExcelWorkbook.attachAs(String templatePath, String outPath) { 
     Excel excel = Excel.decodeBytes(File(templatePath).readAsBytesSync());
-    return ExcelWorkbook._(outPath, excel, excel.sheets.length, _ExcelMode.edit);
+    return ExcelWorkbook._(outPath, excel, _ExcelMode.edit);
   }
 
   void alterSheetName(String oldName, String newName) {
@@ -56,13 +55,10 @@ class ExcelWorkbook {
 
 
   void createSheet(String sheetName, Iterable<({String name, String ty})> cols) {
-    // todo this logic is wrong now we have dropSheet...
     // In create mode, `Sheet1` is auto-created, the first sheet needs to rename it
-    if (_sheetCount == 1 && _mode == _ExcelMode.create) {
+    if (_excel.sheets.length == 1 && _mode == _ExcelMode.create && _excel.sheets.containsKey('Sheet1')) {
+      print("createSheet renaming Sheet1...");
       _excel.rename('Sheet1', sheetName);
-    }
-    else {
-      _sheetCount++;
     }
     final sheet = _excel[sheetName];
     List<TextCellValue> cells = cols.map((col) => TextCellValue(col.name)).toList();
