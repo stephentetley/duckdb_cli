@@ -40,8 +40,8 @@ void createXlsx(String dbpath, String outpath) {
   if (File(outpath).existsSync()) {
     File(outpath).deleteSync();
   }
-  final wb = ExcelWorkbook.attach(outpath);
-  outputXlsxTable('Telemetry Outstations', db, wb);
+  final wb = ExcelWorkbook.attach(path: outpath);
+  copyTableToExcel('Telemetry Outstations', db, wb);
   wb.detach();
   db.close();
 }

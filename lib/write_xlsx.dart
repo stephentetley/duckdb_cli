@@ -32,7 +32,7 @@ class ExcelWorkbook {
 
   ExcelWorkbook._(this._outputPath, this._excel, this._mode);
 
-  factory ExcelWorkbook.attach(String path) {
+  factory ExcelWorkbook.attach({required String path}) {
     if (File(path).existsSync()) {
       var excel = Excel.decodeBytes(File(path).readAsBytesSync());
       return ExcelWorkbook._(path, excel, _ExcelMode.edit);
@@ -42,12 +42,12 @@ class ExcelWorkbook {
     }
   }
 
-  factory ExcelWorkbook.attachAs(String templatePath, String outPath) { 
+  factory ExcelWorkbook.attachAs({required String templatePath, required String outPath}) { 
     Excel excel = Excel.decodeBytes(File(templatePath).readAsBytesSync());
     return ExcelWorkbook._(outPath, excel, _ExcelMode.edit);
   }
 
-  void alterSheetName(String oldName, String newName) {
+  void alterSheetName({required String oldName, required String newName}) {
     if (_excel.sheets.containsKey(oldName)) {
     _excel.rename(oldName, newName);
     }
@@ -63,19 +63,19 @@ class ExcelWorkbook {
   }
 
 
-  void createSheet(String sheetName, Iterable<({String name, String ty})> cols) {
+  void createSheet({required String sheetName, required Iterable<({String name, String ty})> columns}) {
     // In create mode, `Sheet1` is auto-created, the first sheet needs to rename it
     if (_excel.sheets.length == 1 && _mode == _ExcelMode.create && _excel.sheets.containsKey('Sheet1')) {
       print("createSheet renaming Sheet1...");
       _excel.rename('Sheet1', sheetName);
     }
     final sheet = _excel[sheetName];
-    List<TextCellValue> cells = cols.map((col) => TextCellValue(col.name)).toList();
+    List<TextCellValue> cells = columns.map((col) => TextCellValue(col.name)).toList();
     sheet.appendRow(cells);
-    _sheetInfo.addAll({sheetName: cols});
+    _sheetInfo.addAll({sheetName: columns});
   }
 
-  void dropSheetIfExists(String sheetName) {
+  void dropSheetIfExists({required String sheetName}) {
     if (_excel.sheets.containsKey(sheetName)) {
       if(_excel.sheets.length > 1) {
         _excel.delete(sheetName);
@@ -92,11 +92,11 @@ class ExcelWorkbook {
     }
   }
 
-  void insertInto(String sheetName, ResultSet rs) {
+  void insertInto({required String sheetName, required ResultSet resultset}) {
     Sheet? sheet = _excel.sheets[sheetName];
     Iterable<({String name, String ty})>? cols = _sheetInfo[sheetName];
     if (sheet != null && cols != null) {
-      for (final Row row in rs) {
+      for (final Row row in resultset) {
         final List<CellValue> cells = [];
         for (final ({String name, String ty}) record in cols) {
           var value = row[record.name];

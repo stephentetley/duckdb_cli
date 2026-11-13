@@ -16,8 +16,8 @@ String dblQuote(String s) {
 
 
 
-void outputXlsxTable(String tableName, Database db, ExcelWorkbook wb) {
-  final sql1 = "select cid, name, type from pragma_table_info('$tableName') order by cid;";
+void copyTableToExcel(String sourceTable, Database db, ExcelWorkbook wb) {
+  final sql1 = "select cid, name, type from pragma_table_info('$sourceTable') order by cid;";
 
   final ResultSet rs1 = db.select(sql1);
 
@@ -28,16 +28,16 @@ void outputXlsxTable(String tableName, Database db, ExcelWorkbook wb) {
   }
   print(cols);
 
-  wb.dropSheetIfExists(tableName);
-  wb.createSheet(tableName, cols);
+  wb.dropSheetIfExists(sheetName: sourceTable);
+  wb.createSheet(sheetName: sourceTable, columns: cols);
 
   /// todo optional order by clause
-  final sql2 = "select ${cols.map((record) {return dblQuote(record.name);}).join(',')} from ${dblQuote(tableName)};";
+  final sql2 = "select ${cols.map((record) {return dblQuote(record.name);}).join(',')} from ${dblQuote(sourceTable)};";
   print(sql2);
   
   final ResultSet rs2 = db.select(sql2);
-  wb.insertInto(tableName, rs2);
-  wb.createNamedTable(sheetName: tableName, tableName: tableName.toPascalCase());
+  wb.insertInto(sheetName: sourceTable, resultset: rs2);
+  wb.createNamedTable(sheetName: sourceTable, tableName: sourceTable.toPascalCase());
 
 
 }
