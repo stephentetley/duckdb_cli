@@ -14,13 +14,18 @@ enum _ExcelMode { create, edit }
 
 
 /// https://www.sqlite.org/datatype3.html
-CellValue _makeCell(String ty, dynamic value) {
-  return switch (ty.toUpperCase()) {
-    'CHARACTER' || 'VARCHAR' || 'TEXT' => TextCellValue(value),
-    'INT' || 'INTEGER' => IntCellValue(value),
-    'REAL' || 'DOUBLE' || 'DOUBLE PRECISION' || 'FLOAT' => DoubleCellValue(value),
-    _ => TextCellValue(value),
-  };
+CellValue? _makeCellValue(String ty, dynamic value) {
+  print('_makeCellValue($ty, $value)');
+  if (value == null) {
+    return null; 
+  } else {
+    return switch (ty.toUpperCase()) {
+      'CHARACTER' || 'VARCHAR' || 'TEXT' => TextCellValue(value),
+      'INT' || 'INTEGER' || 'BIGINT' => IntCellValue(value),
+      'REAL' || 'DOUBLE' || 'DOUBLE PRECISION' || 'FLOAT' => DoubleCellValue(value),
+      _ => TextCellValue(value),
+    };
+  }
 }
 
 
@@ -75,6 +80,10 @@ class ExcelWorkbook {
     _sheetInfo.addAll({sheetName: columns});
   }
 
+  void updateSheet({required String sheetName, required Iterable<({String name, String ty})> columns}) {
+    _sheetInfo.addAll({sheetName: columns});
+  }
+
   void dropSheetIfExists({required String sheetName}) {
     if (_excel.sheets.containsKey(sheetName)) {
       if(_excel.sheets.length > 1) {
@@ -97,12 +106,13 @@ class ExcelWorkbook {
     Iterable<({String name, String ty})>? cols = _sheetInfo[sheetName];
     if (sheet != null && cols != null) {
       for (final Row row in resultset) {
-        final List<CellValue> cells = [];
+        final List<CellValue?> cells = [];
         for (final ({String name, String ty}) record in cols) {
           var value = row[record.name];
-          cells.add(_makeCell(record.ty, value));
+          cells.add(_makeCellValue(record.ty, value));
         }
         sheet.appendRow(cells.toList());
+        print('Cells = ${cells.toList()}');
       }
     }
   }

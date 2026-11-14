@@ -41,7 +41,7 @@ void createXlsx(String dbpath, String outpath) {
     File(outpath).deleteSync();
   }
   final wb = ExcelWorkbook.attach(path: outpath);
-  copyTableToExcel('Telemetry Outstations', db, wb);
+  createSheetForSQLiteTable('Telemetry Outstations', db, wb);
   wb.detach();
   db.close();
 }

@@ -10,13 +10,13 @@ import 'package:change_case/change_case.dart';
 import 'package:duckdb_cli/write_xlsx.dart';
 
 /// todo - escaping...
-String dblQuote(String s) {
+String _dblQuote(String s) {
   return '"$s"';
 }
 
 
 
-void copyTableToExcel(String sourceTable, Database db, ExcelWorkbook wb) {
+void createSheetForSQLiteTable(String sourceTable, Database db, ExcelWorkbook wb) {
   final sql1 = "select cid, name, type from pragma_table_info('$sourceTable') order by cid;";
 
   final ResultSet rs1 = db.select(sql1);
@@ -26,19 +26,38 @@ void copyTableToExcel(String sourceTable, Database db, ExcelWorkbook wb) {
   for (final Row row in rs1) {
     cols.add((name: row['name'], ty: row['type']));
   }
-  print(cols);
 
   wb.dropSheetIfExists(sheetName: sourceTable);
   wb.createSheet(sheetName: sourceTable, columns: cols);
 
   /// todo optional order by clause
-  final sql2 = "select ${cols.map((record) {return dblQuote(record.name);}).join(',')} from ${dblQuote(sourceTable)};";
+  final sql2 = "select ${cols.map((record) {return _dblQuote(record.name);}).join(',')} from ${_dblQuote(sourceTable)};";
   print(sql2);
   
   final ResultSet rs2 = db.select(sql2);
   wb.insertInto(sheetName: sourceTable, resultset: rs2);
   wb.createNamedTable(sheetName: sourceTable, tableName: sourceTable.toPascalCase());
-
-
 }
+
+void appendSQLiteTableToExistingSheet(String sourceTable, Database db, ExcelWorkbook wb, String sheetName) {
+  final sql1 = "select cid, name, type from pragma_table_info('$sourceTable') order by cid;";
+
+  final ResultSet rs1 = db.select(sql1);
+
+  List<({String name, String ty})> cols = [];
+
+  for (final Row row in rs1) {
+    cols.add((name: row['name'], ty: row['type']));
+  }
+
+  wb.updateSheet(sheetName: sheetName, columns: cols);
+
+  /// todo optional order by clause
+  final sql2 = "select ${cols.map((record) {return _dblQuote(record.name);}).join(',')} from $sourceTable;";
+  print(sql2);
+  
+  final ResultSet rs2 = db.select(sql2);
+  wb.insertInto(sheetName: sheetName, resultset: rs2);
+}
+
 
