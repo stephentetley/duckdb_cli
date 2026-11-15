@@ -47,10 +47,6 @@ class ExcelWorkbook {
     }
   }
 
-  factory ExcelWorkbook.attachAs({required String templatePath, required String outPath}) { 
-    Excel excel = Excel.decodeBytes(File(templatePath).readAsBytesSync());
-    return ExcelWorkbook._(outPath, excel, _ExcelMode.edit);
-  }
 
   void alterSheetName({required String oldName, required String newName}) {
     if (_excel.sheets.containsKey(oldName)) {

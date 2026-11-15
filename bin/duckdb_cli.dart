@@ -1,9 +1,7 @@
 import 'package:duckdb_cli/duckdb_invoke.dart';
 import 'package:duckdb_cli/use_excel_plus.dart';
 import 'package:duckdb_cli/use_sqlite.dart';
-import 'package:duckdb_cli/excel_workbook.dart';
 import 'package:duckdb_cli/output_xlsx.dart';
-import 'package:sqlite3/sqlite3.dart';
 import 'dart:io';
 
 
@@ -35,14 +33,18 @@ void main(List<String> arguments) async {
 
 }
 
-void createXlsx(String dbpath, String outpath) {
-  final db = sqlite3.open(dbpath);
-  if (File(outpath).existsSync()) {
-    File(outpath).deleteSync();
+void createXlsx(String dbPath, String outPath) {
+  if (File(outPath).existsSync()) {
+    File(outPath).deleteSync();
   }
-  final wb = ExcelWorkbook.attach(path: outpath);
-  createSheetForSQLiteTable('Telemetry Outstations', db, wb);
-  wb.detach();
-  db.close();
+  addTableAsSheet(
+    sourceTable: 'Telemetry Outstations', 
+    dbPath: dbPath, 
+    xlsxPath: outPath,
+    orderByColumns: ['temp_id'],
+    destSheet: 'Telemetry Outstations',
+    destTableName: 'Outstations'
+  );
+
 }
 
