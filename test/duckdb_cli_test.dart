@@ -1,12 +1,12 @@
-import 'package:duckdb_cli/write_xlsx.dart';
+import 'package:duckdb_cli/excel_workbook.dart';
 import 'package:duckdb_cli/output_xlsx.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:excel_plus/excel_plus.dart';
 import 'dart:io';
 
 void main() {
-  createXlsx(
-    dbPath: "./data/new_simple_equi.sqlite",
+  createXlsxFromTemplate(
+    dbPath: "./data/new_simple_equi_create_batch01.sqlite",
     xlsxTemplate: "./data/AIW_Equi_Creation_Template_V1.0.xlsx",
     outPath: "./output/uploader_EQUI_CREATE.xlsx"
   );
@@ -17,13 +17,21 @@ void main() {
 }
 
 
-void createXlsx({required String dbPath, required String xlsxTemplate, required String outPath}) {
+void createXlsxFromTemplate({required String dbPath, required String xlsxTemplate, required String outPath}) {
   if (File(outPath).existsSync()) {
     File(outPath).deleteSync();
   }
   final db = sqlite3.open(dbPath);
   final wb = ExcelWorkbook.attachAs(outPath: outPath, templatePath: xlsxTemplate);
+  appendSQLiteTableToExistingSheet('equi_create_change_request_header', db, wb, 'Change Request Header');
+  appendSQLiteTableToExistingSheet('equi_create_change_request_notes', db, wb, 'Change Request Notes');
   appendSQLiteTableToExistingSheet('equi_create_equipment_data', db, wb, 'EQ-Equipment Data');
+  wb.deleteRowsFromSheet(
+    sheetName: 'EQ-Classification', 
+    startInclusive: 6, 
+    endInclusive: 63
+  );
+  appendSQLiteTableToExistingSheet('equi_create_classification', db, wb, 'EQ-Classification');
   wb.detach();
   db.close();
 }
@@ -41,5 +49,4 @@ void modifyTemplate({required String xlsxTemplate, required String outPath}) {
   sheet.updateCell(CellIndex.indexByString('B6'), TextCellValue('Outstations (SPT) 14.11.26'));
   
   File(outPath).writeAsBytesSync(excel.save()!);
-  
 }

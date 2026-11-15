@@ -1,7 +1,7 @@
 import 'package:duckdb_cli/duckdb_invoke.dart';
 import 'package:duckdb_cli/use_excel_plus.dart';
 import 'package:duckdb_cli/use_sqlite.dart';
-import 'package:duckdb_cli/write_xlsx.dart';
+import 'package:duckdb_cli/excel_workbook.dart';
 import 'package:duckdb_cli/output_xlsx.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'dart:io';

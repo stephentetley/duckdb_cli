@@ -7,7 +7,7 @@
 
 import 'package:sqlite3/sqlite3.dart';
 import 'package:change_case/change_case.dart';
-import 'package:duckdb_cli/write_xlsx.dart';
+import 'package:duckdb_cli/excel_workbook.dart';
 
 /// todo - escaping...
 String _dblQuote(String s) {
@@ -54,7 +54,6 @@ void appendSQLiteTableToExistingSheet(String sourceTable, Database db, ExcelWork
 
   /// todo optional order by clause
   final sql2 = "select ${cols.map((record) {return _dblQuote(record.name);}).join(',')} from $sourceTable;";
-  print(sql2);
   
   final ResultSet rs2 = db.select(sql2);
   wb.insertInto(sheetName: sheetName, resultset: rs2);

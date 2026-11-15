@@ -15,7 +15,7 @@ enum _ExcelMode { create, edit }
 
 /// https://www.sqlite.org/datatype3.html
 CellValue? _makeCellValue(String ty, dynamic value) {
-  print('_makeCellValue($ty, $value)');
+  // print('_makeCellValue($ty, $value)');
   if (value == null) {
     return null; 
   } else {
@@ -71,7 +71,6 @@ class ExcelWorkbook {
   void createSheet({required String sheetName, required Iterable<({String name, String ty})> columns}) {
     // In create mode, `Sheet1` is auto-created, the first sheet needs to rename it
     if (_excel.sheets.length == 1 && _mode == _ExcelMode.create && _excel.sheets.containsKey('Sheet1')) {
-      print("createSheet renaming Sheet1...");
       _excel.rename('Sheet1', sheetName);
     }
     final sheet = _excel[sheetName];
@@ -98,7 +97,7 @@ class ExcelWorkbook {
           _excel.delete(sheetName);
         }
       } 
-    }
+    }    
   }
 
   void insertInto({required String sheetName, required ResultSet resultset}) {
@@ -112,7 +111,15 @@ class ExcelWorkbook {
           cells.add(_makeCellValue(record.ty, value));
         }
         sheet.appendRow(cells.toList());
-        print('Cells = ${cells.toList()}');
+      }
+    }
+  }
+
+  void deleteRowsFromSheet({required String sheetName, required int startInclusive, required endInclusive}) {
+    Sheet? sheet = _excel.sheets[sheetName];
+    if (sheet != null) {
+      for (var i = startInclusive; i <= endInclusive; i++) {
+        sheet.removeRow(i);
       }
     }
   }
