@@ -39,7 +39,7 @@ void createSheetForSQLiteTable(String sourceTable, Database db, ExcelWorkbook wb
   wb.createNamedTable(sheetName: sourceTable, tableName: sourceTable.toPascalCase());
 }
 
-void appendSQLiteTableToExistingSheet(String sourceTable, Database db, ExcelWorkbook wb, String sheetName) {
+void appendSQLiteTableToExistingSheet(String sourceTable, Database db, ExcelWorkbook wb, String sheetName, int startRow) {
   final sql1 = "select cid, name, type from pragma_table_info('$sourceTable') order by cid;";
 
   final ResultSet rs1 = db.select(sql1);
@@ -56,7 +56,7 @@ void appendSQLiteTableToExistingSheet(String sourceTable, Database db, ExcelWork
   final sql2 = "select ${cols.map((record) {return _dblQuote(record.name);}).join(',')} from $sourceTable;";
   
   final ResultSet rs2 = db.select(sql2);
-  wb.insertInto(sheetName: sheetName, resultset: rs2);
+  wb.overwriteInto(sheetName: sheetName, resultset: rs2, startRow: startRow);
 }
 
 

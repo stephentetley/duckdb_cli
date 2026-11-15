@@ -23,15 +23,14 @@ void createXlsxFromTemplate({required String dbPath, required String xlsxTemplat
   }
   final db = sqlite3.open(dbPath);
   final wb = ExcelWorkbook.attachAs(outPath: outPath, templatePath: xlsxTemplate);
-  appendSQLiteTableToExistingSheet('equi_create_change_request_header', db, wb, 'Change Request Header');
-  appendSQLiteTableToExistingSheet('equi_create_change_request_notes', db, wb, 'Change Request Notes');
-  appendSQLiteTableToExistingSheet('equi_create_equipment_data', db, wb, 'EQ-Equipment Data');
+  appendSQLiteTableToExistingSheet('equi_create_change_request_header', db, wb, 'Change Request Header', 5);
+  appendSQLiteTableToExistingSheet('equi_create_change_request_notes', db, wb, 'Change Request Notes', 4);
+  appendSQLiteTableToExistingSheet('equi_create_equipment_data', db, wb, 'EQ-Equipment Data', 5);
   wb.deleteRowsFromSheet(
     sheetName: 'EQ-Classification', 
-    startInclusive: 6, 
-    endInclusive: 63
+    start: 6
   );
-  appendSQLiteTableToExistingSheet('equi_create_classification', db, wb, 'EQ-Classification');
+  appendSQLiteTableToExistingSheet('equi_create_classification', db, wb, 'EQ-Classification', 5);
   wb.detach();
   db.close();
 }
@@ -42,11 +41,17 @@ void modifyTemplate({required String xlsxTemplate, required String outPath}) {
     File(outPath).deleteSync();
   }
   final excel = Excel.decodeBytes(File(xlsxTemplate).readAsBytesSync());
-  final sheet = excel['Change Request Header'];
+  final sheet = excel['EQ-Classification'];
   final cell = sheet.cell(CellIndex.indexByString('B5'));
   print("B5 is `${cell.value}`");
-
-  sheet.updateCell(CellIndex.indexByString('B6'), TextCellValue('Outstations (SPT) 14.11.26'));
+  print("maxRows: ${sheet.maxRows}");
+  sheet.insertRowIterables(
+    [TextCellValue('\$5006'), 
+    TextCellValue('FSTNEM'), 
+    TextCellValue('LOCATION_ON_SITE'), 
+    TextCellValue('Kiosk')], 
+    5
+  );
   
   File(outPath).writeAsBytesSync(excel.save()!);
 }

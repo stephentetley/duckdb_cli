@@ -115,10 +115,29 @@ class ExcelWorkbook {
     }
   }
 
-  void deleteRowsFromSheet({required String sheetName, required int startInclusive, required endInclusive}) {
+  void overwriteInto({required String sheetName, 
+      required ResultSet resultset, 
+      required int startRow}) {
+    Sheet? sheet = _excel.sheets[sheetName];
+    Iterable<({String name, String ty})>? cols = _sheetInfo[sheetName];
+    int i = startRow;
+    if (sheet != null && cols != null) {
+      for (final Row row in resultset) {
+        final List<CellValue?> cells = [];
+        for (final ({String name, String ty}) record in cols) {
+          var value = row[record.name];
+          cells.add(_makeCellValue(record.ty, value));
+        }
+        sheet.insertRowIterables(cells.toList(), i);
+        i++;
+      }
+    }
+  }  
+
+  void deleteRowsFromSheet({required String sheetName, required int start}) {
     Sheet? sheet = _excel.sheets[sheetName];
     if (sheet != null) {
-      for (var i = startInclusive; i <= endInclusive; i++) {
+      for (var i = start; i <= sheet.maxRows; i++) {
         sheet.removeRow(i);
       }
     }
