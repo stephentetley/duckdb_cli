@@ -2,6 +2,7 @@ import 'package:duckdb_cli/xlsx_cli.dart';
 import 'dart:io';
 
 void main() {
+  print("test1.main()");
   createXlsxFromTemplate(
     dbPath: "./data/new_simple_equi_create_batch01.sqlite",
     xlsxTemplate: "./data/AIW_Equi_Creation_Template_V1.0.xlsx",

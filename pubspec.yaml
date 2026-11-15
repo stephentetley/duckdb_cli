@@ -8,7 +8,7 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  change_case: ^2.2.0
+  collection: ^1.19.1
   excel_plus: ^2.29.2
   path: ^1.9.0
   sqlite3: ^3.9.0

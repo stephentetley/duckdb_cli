@@ -47,13 +47,19 @@ class _ExcelWorkbook {
   }
 
 
-  void alterSheetName({required String oldName, required String newName}) {
+  void alterSheetName({
+    required String oldName, 
+    required String newName,
+  }) {
     if (_excel.sheets.containsKey(oldName)) {
     _excel.rename(oldName, newName);
     }
   }
 
-  void createNamedTable({required String sheetName, required String tableName}) {
+  void createNamedTable({
+    required String sheetName, 
+    required String tableName, 
+  }) {
     final sheet = _excel[sheetName];
     sheet.addTable(ExcelTable(
       name: tableName, 
@@ -63,7 +69,10 @@ class _ExcelWorkbook {
   }
 
 
-  void createSheet({required String sheetName, required Iterable<({String name, String ty})> columns}) {
+  void createSheet({
+    required String sheetName, 
+    required Iterable<({String name, String ty})> columns
+  }) {
     // In create mode, `Sheet1` is auto-created, the first sheet needs to rename it
     if (_excel.sheets.length == 1 && _mode == _ExcelMode.create && _excel.sheets.containsKey('Sheet1')) {
       _excel.rename('Sheet1', sheetName);
@@ -74,7 +83,10 @@ class _ExcelWorkbook {
     _sheetInfo.addAll({sheetName: columns});
   }
 
-  void updateSheet({required String sheetName, required Iterable<({String name, String ty})> columns}) {
+  void updateSheet({
+    required String sheetName, 
+    required Iterable<({String name, String ty})> columns
+  }) {
     _sheetInfo.addAll({sheetName: columns});
   }
 
@@ -95,7 +107,10 @@ class _ExcelWorkbook {
     }    
   }
 
-  void insertInto({required String sheetName, required ResultSet resultset}) {
+  void insertInto({
+    required String sheetName, 
+    required ResultSet resultset
+  }) {
     Sheet? sheet = _excel.sheets[sheetName];
     Iterable<({String name, String ty})>? cols = _sheetInfo[sheetName];
     if (sheet != null && cols != null) {
@@ -110,9 +125,11 @@ class _ExcelWorkbook {
     }
   }
 
-  void overwriteInto({required String sheetName, 
-      required ResultSet resultset, 
-      required int startRow}) {
+  void overwriteInto({
+    required String sheetName, 
+    required ResultSet resultset, 
+    required int startRow,
+  }) {
     Sheet? sheet = _excel.sheets[sheetName];
     Iterable<({String name, String ty})>? cols = _sheetInfo[sheetName];
     int i = startRow;

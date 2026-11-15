@@ -32,11 +32,47 @@ void extractWorkbookInfo({
 }
 
 
-
-void copyXlsxTemplate({required String templatePath, required String outPath}) { 
-    Excel excel = Excel.decodeBytes(File(templatePath).readAsBytesSync());
-    File(outPath).writeAsBytesSync(excel.save()!);
+void tableToJson({
+  required String path, 
+  required String sheetName, 
+  required String tableName,
+  required String outPath,
+}) {
+  final excel = Excel.decodeBytes(File(path).readAsBytesSync());
+  final sheet = excel[sheetName];
+  final table = sheet.tables.firstWhereOrNull((t) => t.name == tableName);
+  final tempExcel = Excel.createExcel();
+  final tempSheet = tempExcel.sheets['Sheet1'];
+  if (table != null && tempSheet != null) {
+    final startCell = table.from;
+    final endCell = table.to;
+    for (var r = startCell.rowIndex; r <= endCell.rowIndex; r++) {
+      final List<CellValue?> cellsOfARow = [];
+      for (var c = startCell.columnIndex; c <= endCell.columnIndex; c++) {
+        var cell = sheet.cell(CellIndex.indexByColumnRow(
+          columnIndex: c,
+          rowIndex: r,
+        ));
+        cellsOfARow.add(cell.value);
+      }
+      tempSheet.appendRow(cellsOfARow.toList());
+    } 
+    var jsonString = tempSheet.toJson();
+    File(outPath).writeAsStringSync(jsonString);
   }
+}
+
+
+
+
+/// Copy a template workbook to a nwe file for writing
+void copyXlsxTemplate({
+  required String templatePath, 
+  required String outPath
+}) { 
+  Excel excel = Excel.decodeBytes(File(templatePath).readAsBytesSync());
+  File(outPath).writeAsBytesSync(excel.save()!);
+}
 
 /// Use this to dump a table into a new sheet
 void addTableAsSheet({
