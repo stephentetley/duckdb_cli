@@ -5,14 +5,13 @@
  * that can be found in the LICENSE.md file.
  */
 
+part of 'xlsx_cli.dart';
 
-import 'package:excel_plus/excel_plus.dart';
-import 'package:sqlite3/sqlite3.dart';
-import 'dart:io';
+
 
 enum _ExcelMode { create, edit }
 
-
+/// todo Needs filling out...
 /// https://www.sqlite.org/datatype3.html
 CellValue? _makeCellValue(String ty, dynamic value) {
   // print('_makeCellValue($ty, $value)');
@@ -29,21 +28,21 @@ CellValue? _makeCellValue(String ty, dynamic value) {
 }
 
 
-class ExcelWorkbook {
+class _ExcelWorkbook {
   final String _outputPath;
   final Excel _excel;
   final _ExcelMode _mode;
   final Map<String, Iterable<({String name, String ty})>> _sheetInfo = {};
 
-  ExcelWorkbook._(this._outputPath, this._excel, this._mode);
+  _ExcelWorkbook._(this._outputPath, this._excel, this._mode);
 
-  factory ExcelWorkbook.attach({required String path}) {
+  factory _ExcelWorkbook.attach({required String path}) {
     if (File(path).existsSync()) {
       var excel = Excel.decodeBytes(File(path).readAsBytesSync());
-      return ExcelWorkbook._(path, excel, _ExcelMode.edit);
+      return _ExcelWorkbook._(path, excel, _ExcelMode.edit);
     } else {
       var excel = Excel.createExcel();
-      return ExcelWorkbook._(path, excel, _ExcelMode.create);
+      return _ExcelWorkbook._(path, excel, _ExcelMode.create);
     }
   }
 

@@ -6,12 +6,9 @@
  */
 
 import 'package:excel_plus/excel_plus.dart';
+import 'package:sqlite3/sqlite3.dart';
+import 'dart:convert';
 import 'dart:io';
 
-
-Iterable<String> getSheetNames(String filename) {
-  final bytes = File(filename).readAsBytesSync();
-  final excel = Excel.decodeBytes(bytes);
-  
-  return excel.tables.keys;
-}
+part 'excel_workbook.dart';
+part 'xlsx_operations.dart';

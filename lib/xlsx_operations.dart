@@ -5,15 +5,32 @@
  * that can be found in the LICENSE.md file.
  */
 
-import 'package:excel_plus/excel_plus.dart';
-import 'package:sqlite3/sqlite3.dart';
-import 'package:duckdb_cli/excel_workbook.dart';
-import 'dart:io';
+part of 'xlsx_cli.dart';
+
+
 
 /// todo - escaping...
 String _dblQuote(String s) {
   return '"$s"';
 }
+
+void extractWorkbookInfo({
+  required String xlsxPath,
+  required String outPath,
+}) {
+  final bytes = File(xlsxPath).readAsBytesSync();
+  final excel = Excel.decodeBytes(bytes);
+  final tables = excel.sheets.map((k,v) => MapEntry(k, v.tables.map((t) => t.name).toList()));
+  final Map<String, dynamic> payload = {
+    'fileName': xlsxPath,
+    'sheetNames': excel.sheetOrder,
+    'tables': tables,
+  };
+  final JsonEncoder encoder = JsonEncoder.withIndent('  ');
+  final jsonString = encoder.convert(payload);
+  File(outPath).writeAsStringSync(jsonString);
+}
+
 
 
 void copyXlsxTemplate({required String templatePath, required String outPath}) { 
@@ -39,7 +56,7 @@ void addTableAsSheet({
   for (final Row row in rs1) {
     cols.add((name: row['name'], ty: row['type']));
   }
-  final wb = ExcelWorkbook.attach(path: xlsxPath);
+  final wb = _ExcelWorkbook.attach(path: xlsxPath);
   wb.dropSheetIfExists(sheetName: sourceTable);
   wb.createSheet(sheetName: sourceTable, columns: cols);
 
@@ -74,7 +91,7 @@ void addTableOverwriteSheet({
     cols.add((name: row['name'], ty: row['type']));
   }
 
-  final wb = ExcelWorkbook.attach(path: xlsxPath);
+  final wb = _ExcelWorkbook.attach(path: xlsxPath);
   wb.updateSheet(sheetName: destSheet, columns: cols);
 
   final selectList = cols.map((record) => _dblQuote(record.name)).join(',');

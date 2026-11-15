@@ -1,6 +1,4 @@
-import 'package:duckdb_cli/excel_workbook.dart';
-import 'package:duckdb_cli/output_xlsx.dart';
-import 'package:sqlite3/sqlite3.dart';
+import 'package:duckdb_cli/xlsx_cli.dart';
 import 'dart:io';
 
 void main() {
